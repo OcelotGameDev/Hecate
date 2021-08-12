@@ -10,12 +10,12 @@ public class BaseEnemy : MonoBehaviour, IHittable
     public TypesOfMonster monsterType;
     public float distanceToChase, distanceToAtk, maxHp, maxSpeed, timeToIdle;
     public float sightRadius, sightAngle, groundSight;
-    public Transform player, nose;
+    public Transform player, target, nose;
     public LayerMask groundLayer, targetMask, obstaclesLayer;
     
     bool isDead=> currentHp <= 0;
-    bool movingRight = true;
-    float speed,currentHp, distToPoint;
+    bool movingRight = true, canDash=false;
+    float speed,currentHp, distToPoint, distanceToTarget;
     Action aiAction;
     RaycastHit2D hitToGround;
 
@@ -83,6 +83,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                     sightRadius = 4;
                     sightAngle = 35;
                     aiAction = SightAI;
+                    canDash = true;
                 }
                 break;
 
@@ -93,6 +94,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                     sightRadius = 6;
                     sightAngle = 35;
                     aiAction = SightAI;
+                    canDash = true;
                 }
                 break;
         }
@@ -104,17 +106,26 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
         if (sight != null)
         {   
-            Transform target = sight.transform; //hit position in the world
+            target = sight.transform; //hit position in the world
             Vector2 directionToLook = (player.position - transform.position).normalized;//self explanatory
+            
             Debug.DrawLine(transform.position, target.position, Color.red);
 
-            if (Vector3.Angle(transform.position, directionToLook)< sightAngle/2)
+            if (Vector3.Angle(transform.position, directionToLook)<sightAngle/2 && !canDash)
             {
-                float distanceToTarget = Vector2.Distance(transform.position, target.position);
+                distanceToTarget = Vector2.Distance(transform.position, target.position);
                 
                 if (!Physics2D.Raycast(transform.position, directionToLook, distanceToTarget, obstaclesLayer))
                 {
                     aiAction = ToChase;
+                }
+            }else if (Vector3.Angle(transform.position, directionToLook) < sightAngle / 2 && canDash)
+            {
+                distanceToTarget = Vector2.Distance(transform.position, target.position);
+
+                if (!Physics2D.Raycast(transform.position, directionToLook, distanceToTarget, obstaclesLayer))
+                {
+                    aiAction = Dash;
                 }
             }
         }
@@ -129,19 +140,16 @@ public class BaseEnemy : MonoBehaviour, IHittable
             aiAction = act;
             timeToIdle += 5;
         }
-        Debug.Log(timeToIdle);
     }
 
     void ToIdle()
     {
-        Debug.Log("Idle");
         speed = 0;
         Timer(SightAI);
     }
 
     public void ToPatrol()
     {   
-        Debug.Log("Patrol");
         speed = maxSpeed;
         if (hitToGround.collider != false)
         {
@@ -179,6 +187,11 @@ public class BaseEnemy : MonoBehaviour, IHittable
         Debug.Log("Attack");
     }
 
+    void Dash()
+    {
+        Vector2.MoveTowards(this.transform.position, target.position, distanceToTarget);
+    }
+
     void OnDrawGizmos()
     {
         Color newColor;
@@ -187,4 +200,5 @@ public class BaseEnemy : MonoBehaviour, IHittable
         Gizmos.color = newColor;
         Gizmos.DrawSphere(transform.position, sightRadius);
     }
+
 }
