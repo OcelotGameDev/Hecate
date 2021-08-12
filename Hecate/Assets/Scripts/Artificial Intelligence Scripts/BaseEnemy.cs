@@ -40,7 +40,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
         rBody = GetComponent<Rigidbody2D>();
     }
     
-    public void Hit(int damage = -1)
+    public void Hit(int damage = 1, Transform attacker = null)
     {
         if (isDead)
         {
