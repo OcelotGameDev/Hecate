@@ -3,12 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TypesOfBhvr { Idle, Patrol, Chase, Attack };
-
 public class LeonAIBrain
 {
     Action currentAction;
-    TypesOfBhvr enumBehaviours;
 
     public void Brain(Action newAction)
     {
@@ -16,41 +13,9 @@ public class LeonAIBrain
         currentAction.Invoke();
     }
 
-    /*public void SetMonsterType()
+    IEnumerator Timer(Action action, float waitTime) //teste de ideia de melhor automação de transição.
     {
-        switch (monsterType)
-        {
-            case TypesOfMonster.Lobisomen:
-                {
-                    maxSpeed = 2;
-                    maxHp = 5;
-                    sightRadius = 3;
-                    sightAngle = 35;
-                    aiAction = SightAI;
-                }
-                break;
-
-            case TypesOfMonster.Cachorro:
-                {
-                    maxSpeed = 5;
-                    maxHp = 10;
-                    sightRadius = 4;
-                    sightAngle = 35;
-                    aiAction = SightAI;
-                    canDash = true;
-                }
-                break;
-
-            case TypesOfMonster.Boss:
-                {
-                    maxSpeed = 15;
-                    maxHp = 20;
-                    sightRadius = 6;
-                    sightAngle = 35;
-                    aiAction = SightAI;
-                    canDash = true;
-                }
-                break;
-        }
-    }*/
+        yield return new WaitForSeconds(waitTime);
+        currentAction = action;
+    }
 }

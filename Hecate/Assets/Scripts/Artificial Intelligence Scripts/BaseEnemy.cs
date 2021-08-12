@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public enum TypesOfMonster {Lobisomen, Cachorro, Boss};
 
@@ -9,13 +10,17 @@ public class BaseEnemy : MonoBehaviour, IHittable
 {   
     public TypesOfMonster monsterType;
     public float distanceToChase, distanceToAtk, maxHp, maxSpeed, timeToIdle;
-    public float sightRadius, sightAngle, groundSight;
-    public Transform player, target, nose;
+    public float sightRadius, sightAngle, groundSight, direction, dashDistance;
+    public Transform player, nose;
     public LayerMask groundLayer, targetMask, obstaclesLayer;
-    
+    public Collider2D col2D;
+    public GameObject doggy;
+    public Transform[] spawnPos;
+
     bool isDead=> currentHp <= 0;
-    bool movingRight = true, canDash=false;
+    bool movingRight = true, canDash=false, isWere, isDog, isBoss;
     float speed,currentHp, distToPoint, distanceToTarget;
+    int dashMx = 3;
     Action aiAction;
     RaycastHit2D hitToGround;
 
@@ -72,6 +77,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                     sightRadius = 3;
                     sightAngle = 35;
                     aiAction = SightAI;
+                    isWere = true;
                 }
                 break;
 
@@ -83,7 +89,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                     sightRadius = 4;
                     sightAngle = 35;
                     aiAction = SightAI;
-                    canDash = true;
+                    isDog = true;
                 }
                 break;
 
@@ -94,7 +100,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                     sightRadius = 6;
                     sightAngle = 35;
                     aiAction = SightAI;
-                    canDash = true;
+                    isBoss = true;
                 }
                 break;
         }
@@ -102,43 +108,48 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
     void SightAI()
     {
+        speed = maxSpeed;
         Collider2D sight = Physics2D.OverlapCircle(transform.position, sightRadius, targetMask);//total area of sight
 
         if (sight != null)
         {   
-            target = sight.transform; //hit position in the world
+            Transform targetPoint = sight.transform; //hit position in the world
             Vector2 directionToLook = (player.position - transform.position).normalized;//self explanatory
             
-            Debug.DrawLine(transform.position, target.position, Color.red);
+            Debug.DrawLine(transform.position, targetPoint.position, Color.red);
 
-            if (Vector3.Angle(transform.position, directionToLook)<sightAngle/2 && !canDash)
+            if (Vector3.Angle(transform.position, directionToLook)<sightAngle/2)
             {
-                distanceToTarget = Vector2.Distance(transform.position, target.position);
+                float distanceToTarget = Vector2.Distance(transform.position, targetPoint.position);
                 
                 if (!Physics2D.Raycast(transform.position, directionToLook, distanceToTarget, obstaclesLayer))
                 {
                     aiAction = ToChase;
                 }
-            }else if (Vector3.Angle(transform.position, directionToLook) < sightAngle / 2 && canDash)
-            {
-                distanceToTarget = Vector2.Distance(transform.position, target.position);
-
-                if (!Physics2D.Raycast(transform.position, directionToLook, distanceToTarget, obstaclesLayer))
-                {
-                    aiAction = Dash;
-                }
             }
         }
-        else { aiAction = ToPatrol;}
+        else { aiAction = ToPatrol; }
     }
 
     void Timer(Action act)
     {
-        timeToIdle -= 1 * Time.deltaTime;
-        if (timeToIdle <= 0)
+        timeToIdle -= 1 *Time.deltaTime;
+        float timeToDash=4;
+        timeToDash -= 1 * Time.deltaTime;
+
+        if (!isDog)
         {
-            aiAction = act;
-            timeToIdle += 5;
+            if (timeToIdle <= 0)
+            {
+                aiAction = act;
+                timeToIdle = 5;
+            }
+        }else if (isDog)
+        {
+            while (timeToDash > 0)
+            {
+                canDash = true;
+            }
         }
     }
 
@@ -148,29 +159,31 @@ public class BaseEnemy : MonoBehaviour, IHittable
         Timer(SightAI);
     }
 
-    public void ToPatrol()
-    {   
+    void ToPatrol()
+    {
         speed = maxSpeed;
         if (hitToGround.collider != false)
         {
             if (movingRight)
             {
+                direction = 1;
                 rBody.velocity = new Vector2(speed, rBody.velocity.y);
             }
             else
             {
+                direction = -1;
                 rBody.velocity = new Vector2(-speed, rBody.velocity.y);
             }
         }else{
             movingRight = !movingRight;
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
+
         Timer(ToIdle);
     }
 
     void ToChase()
     {
-        Debug.Log("Chase");
         float test;
         test = Mathf.Lerp(transform.position.x, player.position.x, maxSpeed*Time.deltaTime);
         transform.position = new Vector3 (test, this.transform.position.y, this.transform.position.z);
@@ -184,21 +197,97 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
     void ToAttack()
     {
-        Debug.Log("Attack");
+        if (isWere)
+        {
+            
+        }
+
+        if (isDog)
+        {
+            canDash = true;
+            StartCoroutine(DashTimer());
+        }
+
+        if (isBoss)
+        {
+            BossDash();
+        }
     }
 
-    void Dash()
+    IEnumerator DashTimer()
     {
-        Vector2.MoveTowards(this.transform.position, target.position, distanceToTarget);
+        if (isDog && canDash)
+        {
+            rBody.AddForce(new Vector2(dashDistance * direction,0f),ForceMode2D.Impulse);
+            yield return new WaitForSeconds(0.5f);
+            canDash = false;
+        }
+
+        if (isBoss && (dashMx <= 0))
+        {
+            yield return new WaitForSeconds(4f);
+            dashMx = 3;
+        }
     }
 
-    void OnDrawGizmos()
+    void BossDash()
+    {
+        float mxDistance = player.position.x - this.transform.position.x;
+        Vector2 newDistance = new Vector2((player.position.x - this.transform.position.x), this.transform.position.x);
+        if (dashMx > 0 && canDash)
+        {
+            if (Vector2.Distance(this.transform.position, newDistance) <= mxDistance)
+            {
+                dashMx -= dashMx;
+                Vector2.MoveTowards(this.transform.position, newDistance, mxDistance);
+            }
+        }
+        else if(dashMx<=0){ StartCoroutine(DashTimer()); }
+    }
+
+    void LifeEvents()
+    {
+        if (isBoss)
+        {
+            if (currentHp > maxHp/2)
+            {
+
+            }
+
+            if (currentHp <= maxHp / 2 && currentHp <= maxHp / 4)
+            {
+                InvokeDogs();
+            }
+
+            if (currentHp >= maxHp / 4)
+            {
+                aiAction = BossDash;
+            }
+        }
+    }
+
+    void InvokeDogs()
+    {   
+        GameObject clone;
+        for (int i = 0; i < spawnPos.Length; i++)
+        {
+            i++;
+            clone = Instantiate(doggy, spawnPos[i].position, transform.rotation);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        col = col2D;
+    }
+
+    /*void OnDrawGizmos()
     {
         Color newColor;
         newColor = new Color(1, 1, 1, 0.25f);
         // Draw a yellow sphere at the transform's position
         Gizmos.color = newColor;
         Gizmos.DrawSphere(transform.position, sightRadius);
-    }
+    }*/
 
 }
