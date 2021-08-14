@@ -25,6 +25,8 @@ public class PlayerAnimatorController : MonoBehaviour
 
     private void Awake()
     {
+        return;
+        
         _rigidbody = GetComponent<Rigidbody2D>();
         _spriteRendererRight.enabled = true;
         _spriteRendererLeft.enabled = false;

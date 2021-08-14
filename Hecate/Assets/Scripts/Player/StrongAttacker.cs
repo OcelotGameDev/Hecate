@@ -19,7 +19,7 @@ public class StrongAttacker : IAttacker
         //if (RewiredPlayerInput.Instance.StrongAttack && AttackerTimer.TimerEnded)
         {
             _attackDirection = _player.GetDirectionHorizontal();
-            _animatorController.StrongAttack();
+            // _animatorController.StrongAttack();
             _player.StartAttack();
         }
     }

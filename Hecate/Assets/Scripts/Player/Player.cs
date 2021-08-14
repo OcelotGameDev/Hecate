@@ -69,6 +69,7 @@ public class Player : MonoBehaviour, IHittable
     private void Awake()
     {
         PlayerAction = new PlayerActions();
+        PlayerAction.Default.Enable();
 
         AttackerTimer.SetTimer(_playerParameters.TimeBetweenAttacks);
         _waitForSecondsDash = new WaitForSeconds(_playerParameters.TimeBetweenDashes);
@@ -91,38 +92,40 @@ public class Player : MonoBehaviour, IHittable
 
     private void Update()
     {
-        AttackerTimer.SubtractTimer();
-
-        Grounder.Tick();
-
-        if (!(_mover is ForceMover))
-        {
-            if (!_attacking && CanMove)
-            {
-                _mover.Tick();
-
-                if (!(_mover is Dasher))
-                {
-                    _jumper.Tick();
-                    // _wallJumper.Tick();
-                }
-
-                if (Dasher.CheckDashInput()) StartDash();
-            }
-        }
-        else
-        {
-            _mover.Tick();
-        }
-
-        _attacker.Tick();
-        //_attackerList.ForEach(attacker => attacker.Tick());
-
-        CheckJumping();
+        _mover.Tick();
         
-        var isGrounded = Grounder.IsGrounded;
-        AnimatorController.UpdateParameters(isGrounded);
-        JustTouchedGround(isGrounded);
+        // AttackerTimer.SubtractTimer();
+        //
+        // Grounder.Tick();
+        //
+        // if (!(_mover is ForceMover))
+        // {
+        //     if (!_attacking && CanMove)
+        //     {
+        //         _mover.Tick();
+        //
+        //         if (!(_mover is Dasher))
+        //         {
+        //             _jumper.Tick();
+        //             // _wallJumper.Tick();
+        //         }
+        //
+        //         if (Dasher.CheckDashInput()) StartDash();
+        //     }
+        // }
+        // else
+        // {
+        //     _mover.Tick();
+        // }
+        //
+        // // _attacker.Tick();
+        // //_attackerList.ForEach(attacker => attacker.Tick());
+        //
+        // CheckJumping();
+        //
+        // var isGrounded = Grounder.IsGrounded;
+        // // AnimatorController.UpdateParameters(isGrounded);
+        // JustTouchedGround(isGrounded);
     }
 
     private void OnEnable()
