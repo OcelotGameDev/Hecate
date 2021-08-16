@@ -106,14 +106,14 @@ public class NewJumper : IJumper
         _lowGravityFallMultiplayer = player.PlayerParameters.LowGravityFallMultiplayer;
         _permitedArialTime = player.PlayerParameters.PermitedArialTime;
 
-        _player.PlayerAction.Default.Jump.started += JumpStart;
-        _player.PlayerAction.Default.Jump.canceled += JumpEnd;
+        _player.PlayerInputs.Default.Jump.started += JumpStart;
+        _player.PlayerInputs.Default.Jump.canceled += JumpEnd;
     }
 
     ~NewJumper()
     {
-        _player.PlayerAction.Default.Jump.started -= JumpStart;
-        _player.PlayerAction.Default.Jump.canceled -= JumpEnd;
+        _player.PlayerInputs.Default.Jump.started -= JumpStart;
+        _player.PlayerInputs.Default.Jump.canceled -= JumpEnd;
     }
     
 

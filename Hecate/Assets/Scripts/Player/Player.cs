@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using DG.Tweening.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 
 public enum Directions
@@ -49,6 +51,10 @@ public class Player : MonoBehaviour, IHittable
     private PlayerLocker _playerLocker;
     private WaitForSeconds _waitForSecondsDash;
     //private WallJumper _wallJumper;
+    
+    private AAimSystem _aimSystem;
+    private string _bindingGroup;
+    
     public bool IsDashing => _mover is Dasher;
 
     public PlayerParameters PlayerParameters => _playerParameters;
@@ -65,14 +71,26 @@ public class Player : MonoBehaviour, IHittable
     public Rigidbody2D Rigidbody { get; private set; }
     public bool IsAttacking => _attacking;
 
-    public PlayerActions PlayerAction;
+    public PlayerActions PlayerInputs;
 
     public static Transform PlayerPosition;
+    
+    [Header("Parameters")]
+    [SerializeField] private float _aimDistance = 2f;
+    [SerializeField] private float _castCadence = 0.5f;
+    [SerializeField] private GameObject _bulletPrefab;
+    
+    [Header("Objects")] 
+    [SerializeField] private Transform _aim;
+    [SerializeField] private Transform _aimParent;
+    [SerializeField] private Transform _castingPoint;
+    
+    private CastingSystem _castingSystem;
 
     private void Awake()
     {
-        PlayerAction = new PlayerActions();
-        PlayerAction.Default.Enable();
+        PlayerInputs = new PlayerActions();
+        PlayerInputs.Default.Enable();
 
         AttackerTimer.SetTimer(_playerParameters.TimeBetweenAttacks);
         _waitForSecondsDash = new WaitForSeconds(_playerParameters.TimeBetweenDashes);
@@ -85,6 +103,7 @@ public class Player : MonoBehaviour, IHittable
         _glider = new Glider(this);
         _attacker = new BasicAttacker(this);
         //_wallJumper = new WallJumper(this);
+        _castingSystem = new CastingSystem(PlayerInputs.Default.Shoot, _castCadence, _bulletPrefab, _castingPoint.transform);
 
         Rigidbody = this.GetComponent<Rigidbody2D>();
 
@@ -101,6 +120,9 @@ public class Player : MonoBehaviour, IHittable
         
         _jumper.Tick();
         
+        _aimSystem.Tick();
+        _castingSystem.Tick(Time.deltaTime);
+
         // AttackerTimer.SubtractTimer();
         //
         // Grounder.Tick();
@@ -150,11 +172,33 @@ public class Player : MonoBehaviour, IHittable
         _canDash = true;
         
         Grounder.Tick();
+        
+        ChangeControllerScheme(ControllerChooser.CurrentScheme);
+        ControllerChooser.OnSchemeChanged += ChangeControllerScheme;
     }
 
     private void OnDisable()
     {
         PlayerPosition = null;
+        
+        ControllerChooser.OnSchemeChanged -= ChangeControllerScheme;
+    }
+    
+    private void ChangeControllerScheme(SchemeType newScheme)
+    {
+        if (newScheme == SchemeType.Gamepad)
+        {
+            _aimSystem = new AimSystemController(PlayerInputs.Default.Move, PlayerInputs.Default.Aim, _aimParent.transform, _aim.transform, _aimDistance);
+            _bindingGroup = PlayerInputs.controlSchemes.First(input => input.name == "GamePad").bindingGroup;
+        }
+        else
+        {
+            _aimSystem = new AimSystemMouse(PlayerInputs.Default.Aim, _aimParent.transform, _aim.transform, Camera.main);
+            _bindingGroup = PlayerInputs.controlSchemes.First(input => input.name == "Keyboard").bindingGroup;
+        }
+        
+        // _playerInputs.Default.Aim.bindingMask = InputBinding.MaskByGroup(bindingGroup);
+        PlayerInputs.bindingMask = InputBinding.MaskByGroup(_bindingGroup);
     }
 
     private void OnValidate()
@@ -350,6 +394,7 @@ public class Player : MonoBehaviour, IHittable
 
 #if UNITY_EDITOR
     [SerializeField] [EnumToggleButtons] private GizmosType _gizmosToShow = 0;
+    
 
     private void OnDrawGizmos()
     {
@@ -410,4 +455,144 @@ public class Player : MonoBehaviour, IHittable
     }
 #endif //UNITY_EDITOR
     
+}
+
+
+
+public abstract class AAimSystem
+{
+    public abstract void Tick();
+    
+    protected static float GetDeltaAngle(Vector2 aimDirection, Quaternion currentRotation)
+    {
+        var newAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+        var oldAngle = currentRotation.eulerAngles.z;
+        return newAngle - oldAngle;
+    }
+}
+
+public class AimSystemMouse : AAimSystem
+{
+    private readonly InputAction _aimAction;
+    private readonly Transform _aimPivot;
+    private readonly Transform _aim;
+    private readonly Camera _camera;
+
+    public AimSystemMouse(InputAction aimAction, Transform aimPivot, Transform aim, Camera camera)
+    {
+        _aimAction = aimAction;
+        _aimPivot = aimPivot;
+        _aim = aim;
+        _camera = camera;
+    }
+
+    public override void Tick()
+    {
+        var mousePos = _aimAction.ReadValue<Vector2>();
+        mousePos = (Vector2) _camera.ScreenToWorldPoint(mousePos);
+        var dir = mousePos - (Vector2)_aimPivot.position;
+
+        _aimPivot.Rotate(0, 0, GetDeltaAngle(dir, _aimPivot.rotation));
+
+        _aim.position = mousePos;
+    }
+}
+
+public class AimSystemController : AAimSystem
+{
+    private readonly InputAction _moveAction;
+    private readonly InputAction _aimAction;
+    private readonly Transform _aimPivot;
+
+    public AimSystemController(InputAction moveAction, InputAction aimAction, Transform aimPivot, Transform aim = null, float aimDistance = -1)
+    {
+        _moveAction = moveAction;
+        _aimAction = aimAction;
+        _aimPivot = aimPivot;
+
+        if (!aim) return;
+        
+        aim.localPosition = Vector3.right * aimDistance;
+    }
+
+    public override void Tick()
+    {
+        var couldRotate = TryRotate(_aimAction.ReadValue<Vector2>());
+
+        if (couldRotate) return;
+
+        TryRotate(_moveAction.ReadValue<Vector2>());
+    }
+
+    private bool TryRotate(Vector2 dir)
+    {
+        if (dir.magnitude < 0.2f)
+            return false;
+        
+        _aimPivot.Rotate(0, 0, GetDeltaAngle(dir, _aimPivot.rotation)); 
+        return true;
+    }
+}
+
+
+public class CastingSystem
+{
+    private readonly InputAction _castAction;
+    private readonly GameObject _prefab;
+    private readonly Transform _castingPoint;
+
+    private bool _casting = false;
+    private bool _canCast = false;
+
+    private readonly float _castCadence;
+    private float _timer;
+
+    public CastingSystem(InputAction castAction, float castCadence, GameObject prefab, Transform castingPoint)
+    {
+        _castAction = castAction;
+        _castCadence = castCadence;
+        _prefab = prefab;
+        _castingPoint = castingPoint;
+
+        _castAction.started += StartedCasting;
+        _castAction.canceled += EndCast;
+    }
+
+    ~CastingSystem()
+    {
+        _castAction.started -= StartedCasting;
+        _castAction.canceled -= EndCast;
+    }
+
+    public void Tick(float deltaTime)
+    {
+        _canCast = _timer <= 0;
+
+        if (!_canCast)
+            _timer -= deltaTime;
+        else
+            _timer = _castCadence;
+        
+        if (_casting && _canCast)
+        {
+            Cast();    
+        }
+    }
+
+    private void Cast()
+    {
+        var bullet = Object.Instantiate(_prefab).transform;
+        bullet.position = _castingPoint.position;
+        bullet.rotation = _castingPoint.rotation;
+    }
+    
+    private void StartedCasting(InputAction.CallbackContext context)
+    {
+        _casting = true;
+    }
+
+    private void EndCast(InputAction.CallbackContext context)
+    {
+        _casting = false;
+    }
 }

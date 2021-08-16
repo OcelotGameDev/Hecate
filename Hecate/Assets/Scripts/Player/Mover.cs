@@ -70,7 +70,7 @@ public class NewMover : IMover
         _walkSpeed = _player.PlayerParameters.MovementSpeed;
         _walkAcceleration = _player.PlayerParameters.WalkAcceleration;
 
-        var inputValue = _player.PlayerAction.Default.Move.ReadValue<Vector2>().x;
+        var inputValue = _player.PlayerInputs.Default.Move.ReadValue<Vector2>().x;
         if (_player.Grounder.IsGrounded)
         {
             if (Mathf.Abs(inputValue) > 0.30f)
