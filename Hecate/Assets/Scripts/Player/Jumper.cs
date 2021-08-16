@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 public class Jumper : IJumper
@@ -91,6 +92,10 @@ public class NewJumper : IJumper
     private float _permitedArialTime;
     private readonly Rigidbody2D _rigidbody;
 
+    private bool _startedJump = false;
+    private bool _jumping = false;
+    private bool _endedJump = false;
+
     public NewJumper(Player player)
     {
         _player = player;
@@ -100,33 +105,65 @@ public class NewJumper : IJumper
         _gravityFallMultiplayer = player.PlayerParameters.GravityFallMultiplayer;
         _lowGravityFallMultiplayer = player.PlayerParameters.LowGravityFallMultiplayer;
         _permitedArialTime = player.PlayerParameters.PermitedArialTime;
+
+        _player.PlayerAction.Default.Jump.started += JumpStart;
+        _player.PlayerAction.Default.Jump.canceled += JumpEnd;
     }
+
+    ~NewJumper()
+    {
+        _player.PlayerAction.Default.Jump.started -= JumpStart;
+        _player.PlayerAction.Default.Jump.canceled -= JumpEnd;
+    }
+    
 
     public bool Jumping { get; }
 
     public void Tick()
     {
-        _jumpVelocity = _player.PlayerParameters.JumpVelocity;
-        _gravityFallMultiplayer = _player.PlayerParameters.GravityFallMultiplayer;
-        _permitedArialTime = _player.PlayerParameters.PermitedArialTime;
-
-        // if (RewiredPlayerInput.Instance.InitiateJump &&
+        Debug.Log(_player.Grounder.CoyoteGround);
+        // Debug.Log($"{_startedJump} {_jump} {_endedJump}");
+        
+        // _jumpVelocity = _player.PlayerParameters.JumpVelocity;
+        // _gravityFallMultiplayer = _player.PlayerParameters.GravityFallMultiplayer;
+        // _permitedArialTime = _player.PlayerParameters.PermitedArialTime;
+        //
+        // if (_startedJump /*RewiredPlayerInput.Instance.InitiateJump*/ &&
         //     (_playerGrounder.IsGrounded || _playerGrounder.NearGround || _playerGrounder.CoyoteGround) &&
         //     !_jumpAction)
         // {
         //     JumpAction(Vector2.up);
         // }
 
-        if (_rigidbody.velocity.y < 0)
+        if ((!_playerGrounder.IsGrounded) && (_rigidbody.velocity.y < 0 || !_jumping))
         {
-            _rigidbody.velocity +=
-                Vector2.up * (Physics2D.gravity.y * (_gravityFallMultiplayer - 1) * Time.deltaTime);
+            _rigidbody.gravityScale = 10;
+            // _rigidbody.velocity +=
+            //     Vector2.up * (Physics2D.gravity.y * (_gravityFallMultiplayer - 1) * Time.deltaTime);
         }
-        // else if (_rigidbody.velocity.y > 0 && !RewiredPlayerInput.Instance.Jump)
+        else
+        {
+            _rigidbody.gravityScale = 1;
+        }
+        
+        // else if (_rigidbody.velocity.y > 0 && !_jump /*RewiredPlayerInput.Instance.Jump*/)
         // {
         //     _rigidbody.velocity +=
         //         Vector2.up * (Physics2D.gravity.y * (_lowGravityFallMultiplayer - 1) * Time.deltaTime);
         // }
+    }
+    
+    private void JumpStart(InputAction.CallbackContext context)
+    {
+        if (!(_player.Grounder.IsGrounded || _player.Grounder.NearGround || _player.Grounder.CoyoteGround)) return;
+        
+        JumpAction(Vector2.up);
+        _jumping = true; 
+    }
+
+    private void JumpEnd(InputAction.CallbackContext context)
+    {
+        _jumping = false;
     }
 
     private void JumpAction(Vector2 jumpDirection)
@@ -146,9 +183,10 @@ public class NewJumper : IJumper
     private IEnumerator FinishJumpAction()
     {
         yield return new WaitForSeconds(0.2f);
-        // yield return new WaitUntil(() =>
-        //     _playerGrounder.IsGrounded || _playerGrounder.NearGround || RewiredPlayerInput.Instance.TerminateJump ||
-        //     !RewiredPlayerInput.Instance.Jump);
+        yield return new WaitUntil(() =>
+            _playerGrounder.IsGrounded || _playerGrounder.NearGround 
+                                       || _endedJump /*RewiredPlayerInput.Instance.TerminateJump*/ 
+                                       || !_jumping /*RewiredPlayerInput.Instance.Jump*/);
         _jumpAction = false;
     }
 }

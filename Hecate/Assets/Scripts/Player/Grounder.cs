@@ -45,11 +45,11 @@ public class Grounder
     {
         _permitedArialTime = _player.PlayerParameters.PermitedArialTime;
         var lastFrameGround = IsGrounded;
-
+        
         UpdateGroundedValues();
-
+        
         if (lastFrameGround && !IsGrounded) _coyoteRoutine = _player.StartCoroutine(ArialTimeCounter());
-
+        
         if ((_coyoteRoutine != null || CoyoteGround) && IsGrounded)
         {
             CoyoteGround = false;
@@ -75,4 +75,4 @@ public class Grounder
 
         CoyoteGround = false;
     }
-    }
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using DG.Tweening.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -66,6 +67,8 @@ public class Player : MonoBehaviour, IHittable
 
     public PlayerActions PlayerAction;
 
+    public static Transform PlayerPosition;
+
     private void Awake()
     {
         PlayerAction = new PlayerActions();
@@ -92,7 +95,11 @@ public class Player : MonoBehaviour, IHittable
 
     private void Update()
     {
+        Grounder.Tick();
+        
         _mover.Tick();
+        
+        _jumper.Tick();
         
         // AttackerTimer.SubtractTimer();
         //
@@ -130,6 +137,8 @@ public class Player : MonoBehaviour, IHittable
 
     private void OnEnable()
     {
+        PlayerPosition = this.transform;
+        
         Grounder = new Grounder(this);
         _mover = new NewMover(this);
         // _jumper = new NewJumper(this);
@@ -141,6 +150,11 @@ public class Player : MonoBehaviour, IHittable
         _canDash = true;
         
         Grounder.Tick();
+    }
+
+    private void OnDisable()
+    {
+        PlayerPosition = null;
     }
 
     private void OnValidate()
@@ -312,6 +326,11 @@ public class Player : MonoBehaviour, IHittable
         }
 
         StartCoroutine(InvincibilityTime(LifeSystem.InvincibilityTime));
+    }
+
+    public void Heal(int healAmount)
+    {
+        LifeSystem.Heal(healAmount);
     }
 
     [Button] public void Damage() => Hit(1, null);

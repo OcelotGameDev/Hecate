@@ -1,4 +1,6 @@
 ﻿
+using UnityEngine;
+
 public class LifeSystem
 {
     private readonly Player _player;
@@ -30,6 +32,15 @@ public class LifeSystem
 
             if (!StillAlive) Die();
         }
+    }
+
+    public void Heal(int healAmount)
+    {
+        CurrentLife += healAmount;
+
+        CurrentLife = Mathf.Clamp(CurrentLife, 0, MaxHealth);
+
+        _player.DamageDealt(CurrentLife, MaxHealth);
     }
 
     private void Die()
