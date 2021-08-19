@@ -8,15 +8,16 @@ public enum TypesOfMonster {Lobisomen, Cachorro, Boss};
 
 public class BaseEnemy : MonoBehaviour, IHittable
 {   
+    public Transform player, nose;
+    public GameObject doggy;
+    public Transform[] spawnPos;
+    public LayerMask groundLayer, targetMask, obstaclesLayer;
+    
     public TypesOfMonster monsterType;
     public float distanceToChase, distanceToAtk, maxHp, maxSpeed, timeToIdle;
     public float sightRadius, sightAngle, groundSight, direction, dashDistance;
-    public Transform player, nose;
-    public LayerMask groundLayer, targetMask, obstaclesLayer;
-    public Collider2D col2D;
-    public GameObject doggy;
-    public Transform[] spawnPos;
-
+    
+    
     bool isDead=> currentHp <= 0;
     bool movingRight = true, canDash=false, isWere, isDog, isBoss;
     float speed,currentHp, distToPoint, distanceToTarget;
@@ -63,6 +64,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
     void Update()
     {
         hitToGround = Physics2D.Raycast(nose.position, Vector2.down, groundSight, groundLayer);
+        LifeEvents();
     }
     
     void SetMonsterType()
@@ -95,8 +97,8 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
             case TypesOfMonster.Boss:{
                     /* Set values related to BOSS Enemy*/
-                    maxSpeed = 15;
-                    maxHp = 20;
+                    maxSpeed = 10;
+                    maxHp = 15;
                     sightRadius = 6;
                     sightAngle = 35;
                     aiAction = SightAI;
@@ -131,7 +133,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
         else { aiAction = ToPatrol; }
     }
 
-    void Timer(Action act)
+    /*void Timer2(Action act)
     {
         timeToIdle -= 1 *Time.deltaTime;
         float timeToDash=4;
@@ -151,17 +153,28 @@ public class BaseEnemy : MonoBehaviour, IHittable
                 canDash = true;
             }
         }
+    }*/
+
+    IEnumerator Timer(Action act)
+    {
+        yield return new WaitForSeconds(timeToIdle);
+        aiAction = act;
     }
 
     void ToIdle()
     {
+        Debug.Log("Idle");
         speed = 0;
-        Timer(SightAI);
+        StartCoroutine(Timer(SightAI)); ;
     }
 
     void ToPatrol()
     {
+        Debug.Log("Patrol");        
         speed = maxSpeed;
+
+        StartCoroutine(Timer(ToIdle));
+
         if (hitToGround.collider != false)
         {
             if (movingRight)
@@ -178,12 +191,11 @@ public class BaseEnemy : MonoBehaviour, IHittable
             movingRight = !movingRight;
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
-
-        Timer(ToIdle);
     }
 
     void ToChase()
     {
+        Debug.Log("Chase");
         float test;
         test = Mathf.Lerp(transform.position.x, player.position.x, maxSpeed*Time.deltaTime);
         transform.position = new Vector3 (test, this.transform.position.y, this.transform.position.z);
@@ -197,6 +209,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
     void ToAttack()
     {
+        Debug.Log("Attack");
         if (isWere)
         {
             
@@ -259,7 +272,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                 InvokeDogs();
             }
 
-            if (currentHp >= maxHp / 4)
+            if (currentHp <= maxHp / 4)
             {
                 aiAction = BossDash;
             }
@@ -278,16 +291,18 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        col = col2D;
+        if (col.gameObject.CompareTag("Player"))
+        {
+            
+        }
     }
 
-    /*void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         Color newColor;
         newColor = new Color(1, 1, 1, 0.25f);
         // Draw a yellow sphere at the transform's position
         Gizmos.color = newColor;
         Gizmos.DrawSphere(transform.position, sightRadius);
-    }*/
-
+    }
 }

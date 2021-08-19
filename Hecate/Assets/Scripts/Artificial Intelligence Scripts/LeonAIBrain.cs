@@ -13,9 +13,8 @@ public class LeonAIBrain
         currentAction.Invoke();
     }
 
-    IEnumerator Timer(Action action, float waitTime) //teste de ideia de melhor automação de transição.
+    /*public abstract void Patrol()
     {
-        yield return new WaitForSeconds(waitTime);
-        currentAction = action;
-    }
+
+    }*/
 }
