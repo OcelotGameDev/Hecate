@@ -1226,36 +1226,8 @@ PrefabInstance:
       value: AIEnemy
       objectReference: {fileID: 0}
     - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: doggy
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
       propertyPath: player
       value: 
       objectReference: {fileID: 1191749068}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: maxSpeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: timeToIdle
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: distToPoint
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: groundSight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: monsterType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6097615112964736057, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
-      propertyPath: dashDistance
-      value: 4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: db3191d63f4d44842bb1e01e150ac37f, type: 3}
