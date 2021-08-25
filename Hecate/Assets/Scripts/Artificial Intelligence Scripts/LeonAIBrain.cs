@@ -12,9 +12,4 @@ public class LeonAIBrain
         currentAction = newAction;
         currentAction.Invoke();
     }
-
-    /*public abstract void Patrol()
-    {
-
-    }*/
 }
