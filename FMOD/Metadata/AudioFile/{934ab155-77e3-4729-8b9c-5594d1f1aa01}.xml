@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="AudioFile" id="{934ab155-77e3-4729-8b9c-5594d1f1aa01}">
+		<property name="assetPath">
+			<value>Enemies/Stone Werewolves/Step 2.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>1.3348299319727892</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{722f6578-ff5e-486d-be37-84a70d86f8a9}</destination>
+		</relationship>
+	</object>
+</objects>

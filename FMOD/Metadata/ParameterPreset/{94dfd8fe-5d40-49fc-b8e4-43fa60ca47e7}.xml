@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="ParameterPreset" id="{94dfd8fe-5d40-49fc-b8e4-43fa60ca47e7}">
+		<property name="name">
+			<value>Flute Volume</value>
+		</property>
+		<relationship name="folder">
+			<destination>{3128b1de-6d8c-4488-aa2c-2f71bd774aec}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{fd7ee0de-efc7-4a49-8873-e2ed16e08f07}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{fd7ee0de-efc7-4a49-8873-e2ed16e08f07}">
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>
