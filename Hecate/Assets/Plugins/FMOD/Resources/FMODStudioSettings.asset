@@ -559,10 +559,10 @@ MonoBehaviour:
   RealChannelSettings: []
   Plugins: []
   MasterBanks:
-  - Build/Desktop/Music
+  - Music
   Banks:
-  - Build/Desktop/Enemies
-  - Build/Desktop/Main Character
+  - Enemies
+  - Main Character
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
