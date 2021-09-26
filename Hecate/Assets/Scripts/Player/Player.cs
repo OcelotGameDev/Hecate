@@ -230,6 +230,8 @@ public class Player : MonoBehaviour, IHittable
             forceAux = forceAux.normalized * _playerParameters.KnockBackForce;
             PushPlayer(forceAux);
         }
+
+        CameraShakeShake.Instance.ShakeCamera(5f,1f);
     }
     
     public void PushPlayer(Vector3 force)
