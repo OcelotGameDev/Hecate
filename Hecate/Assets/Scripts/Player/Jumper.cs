@@ -121,7 +121,7 @@ public class NewJumper : IJumper
 
     public void Tick()
     {
-        Debug.Log(_player.Grounder.CoyoteGround);
+        // Debug.Log(_player.Grounder.CoyoteGround);
         // Debug.Log($"{_startedJump} {_jump} {_endedJump}");
         
         // _jumpVelocity = _player.PlayerParameters.JumpVelocity;

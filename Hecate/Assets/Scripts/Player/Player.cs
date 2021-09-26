@@ -491,11 +491,12 @@ public class AimSystemMouse : AAimSystem
     public override void Tick()
     {
         var mousePos = _aimAction.ReadValue<Vector2>();
-        mousePos = (Vector2) _camera.ScreenToWorldPoint(mousePos);
+        mousePos = (Vector2) _camera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 20));
+
         var dir = mousePos - (Vector2)_aimPivot.position;
 
         _aimPivot.Rotate(0, 0, GetDeltaAngle(dir, _aimPivot.rotation));
-
+        
         _aim.position = mousePos;
     }
 }

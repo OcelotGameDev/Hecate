@@ -47,7 +47,7 @@ public class @PlayerActions : IInputActionCollection, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""2df71fd5-9e4f-4f50-bcbb-8c45d31184a3"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": ""NormalizeVector2"",
+                    ""processors"": """",
                     ""interactions"": """"
                 }
             ],
@@ -244,7 +244,7 @@ public class @PlayerActions : IInputActionCollection, IDisposable
                     ""id"": ""7762d60e-6145-4ccf-bb40-a8f418f2ed6f"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""NormalizeVector2"",
                     ""groups"": ""GamePad"",
                     ""action"": ""Aim "",
                     ""isComposite"": false,
