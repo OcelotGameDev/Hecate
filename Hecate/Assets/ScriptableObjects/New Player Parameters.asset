@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 10
   _invincibilityTime: 1
-  _movementSpeed: 6
+  _movementSpeed: 10
   _walkAcceleration: 10
   _baseDrag: 5
   _minPushVelocity: 6
@@ -23,7 +23,7 @@ MonoBehaviour:
   _dashVelocity: 20
   _dashMaxTimer: 0
   _timeBetweenDashes: 0.2
-  _jumpVelocity: 15
+  _jumpVelocity: 30
   _maxJumpButtonHoldTime: 0.5
   _gravityFallMultiplayer: 2
   _lowGravityFallMultiplayer: 8
