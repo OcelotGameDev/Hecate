@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
+using FMODUnity;
 
 
 public enum Directions
@@ -103,7 +104,7 @@ public class Player : MonoBehaviour, IHittable
         _glider = new Glider(this);
         _attacker = new BasicAttacker(this);
         //_wallJumper = new WallJumper(this);
-        _castingSystem = new CastingSystem(PlayerInputs.Default.Shoot, _castCadence, _bulletPrefab, _castingPoint.transform);
+        _castingSystem = new CastingSystem(PlayerInputs.Default.Shoot, _castCadence, _bulletPrefab, _castingPoint.transform, _playerParameters.ShotSoundEvent);
 
         Rigidbody = this.GetComponent<Rigidbody2D>();
 
@@ -175,6 +176,9 @@ public class Player : MonoBehaviour, IHittable
         
         ChangeControllerScheme(ControllerChooser.CurrentScheme);
         ControllerChooser.OnSchemeChanged += ChangeControllerScheme;
+
+        Grounder.OnEnterGround += PlayHitGround;
+        Grounder.OnLeaveGround += PlayJump;
     }
 
     private void OnDisable()
@@ -182,6 +186,9 @@ public class Player : MonoBehaviour, IHittable
         PlayerPosition = null;
         
         ControllerChooser.OnSchemeChanged -= ChangeControllerScheme;
+
+        Grounder.OnEnterGround -= PlayHitGround;
+        Grounder.OnLeaveGround -= PlayJump;
     }
     
     private void ChangeControllerScheme(SchemeType newScheme)
@@ -213,12 +220,15 @@ public class Player : MonoBehaviour, IHittable
             _ghostSpawner = GetComponent<PlayerGhostSpawner>();
     }
 
+    [Button]
     public void Hit(int damage, Transform attacker)
     {
+        FMODUnity.RuntimeManager.PlayOneShot(_playerParameters.HitSoundEvent);
+
         // _hurtParticles.EmitParticle();
         _playerAnimatorController.Hurt();
         LifeSystem.Damage(damage);
-
+        
         if (attacker != null)
         {
             var forceAux = (this.transform.position - attacker.position).normalized;
@@ -391,8 +401,16 @@ public class Player : MonoBehaviour, IHittable
         LifeSystem.SetInvincible(false);
         OnPlayerInvincibilityChange?.Invoke(false);
     }
-    
-    
+
+    private void PlayHitGround() {
+        FMODUnity.RuntimeManager.PlayOneShot(_playerParameters.HitGroundSoundEvent);
+    }
+
+    private void PlayJump()
+    {
+        FMODUnity.RuntimeManager.PlayOneShot(_playerParameters.JumpSoundEvent);
+    }
+
 
 #if UNITY_EDITOR
     [SerializeField] [EnumToggleButtons] private GizmosType _gizmosToShow = 0;
@@ -550,7 +568,9 @@ public class CastingSystem
     private readonly float _castCadence;
     private float _timer;
 
-    public CastingSystem(InputAction castAction, float castCadence, GameObject prefab, Transform castingPoint)
+    private readonly string _shotEvent;
+
+    public CastingSystem(InputAction castAction, float castCadence, GameObject prefab, Transform castingPoint, string shotEvent)
     {
         _castAction = castAction;
         _castCadence = castCadence;
@@ -559,6 +579,8 @@ public class CastingSystem
 
         _castAction.started += StartedCasting;
         _castAction.canceled += EndCast;
+
+        _shotEvent = shotEvent;
     }
 
     ~CastingSystem()
@@ -587,6 +609,7 @@ public class CastingSystem
         var bullet = Object.Instantiate(_prefab).transform;
         bullet.position = _castingPoint.position;
         bullet.rotation = _castingPoint.rotation;
+        FMODUnity.RuntimeManager.PlayOneShot(_shotEvent);
     }
     
     private void StartedCasting(InputAction.CallbackContext context)

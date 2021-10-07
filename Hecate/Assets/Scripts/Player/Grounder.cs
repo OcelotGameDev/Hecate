@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class Grounder
@@ -17,6 +18,9 @@ public class Grounder
 
     private float _permitedArialTime;
     private bool _isGrounded;
+
+    public static event Action OnEnterGround;
+    public static event Action OnLeaveGround;
 
     public Grounder(Player player)
     {
@@ -47,8 +51,14 @@ public class Grounder
         var lastFrameGround = IsGrounded;
         
         UpdateGroundedValues();
-        
-        if (lastFrameGround && !IsGrounded) _coyoteRoutine = _player.StartCoroutine(ArialTimeCounter());
+
+        if (lastFrameGround && !IsGrounded)
+        {
+            _coyoteRoutine = _player.StartCoroutine(ArialTimeCounter());
+            OnLeaveGround?.Invoke();
+        }
+        if (!lastFrameGround && IsGrounded) OnEnterGround?.Invoke();
+
         
         if ((_coyoteRoutine != null || CoyoteGround) && IsGrounded)
         {

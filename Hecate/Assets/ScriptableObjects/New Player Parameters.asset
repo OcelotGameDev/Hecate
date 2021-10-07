@@ -60,3 +60,7 @@ MonoBehaviour:
   _basicDownAttackRadius: 0
   _strongAttackCenter: {x: 0, y: 0}
   _strongAttackRadius: 0
+  _hitSoundEvent: event:/Combat/Hit
+  _shotSoundEvent: event:/Combat/Throw Dagger
+  _jumpSoundEvent: event:/Movement/Jump
+  _hitGroundSoundEvent: event:/Movement/Grass Landing

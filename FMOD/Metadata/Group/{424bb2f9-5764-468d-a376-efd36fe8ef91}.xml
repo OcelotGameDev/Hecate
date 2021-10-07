@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="MixerGroup" id="{424bb2f9-5764-468d-a376-efd36fe8ef91}">
+		<property name="volume">
+			<value>-5</value>
+		</property>
+		<property name="name">
+			<value>Music</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{cf40ac13-cd0d-4cb3-ae5e-37d2c046fa1d}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{7308f82f-8729-4636-bb64-dccb8b0445bd}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{6ae1bdae-eaa3-44ce-99cb-83b333812445}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{cf40ac13-cd0d-4cb3-ae5e-37d2c046fa1d}">
+		<relationship name="effects">
+			<destination>{d84d165a-fbfd-49db-bbba-0e1cafd2858d}</destination>
+			<destination>{0370ab88-a84a-4bc6-a12c-4832450e79b7}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{7308f82f-8729-4636-bb64-dccb8b0445bd}" />
+	<object class="MixerBusFader" id="{d84d165a-fbfd-49db-bbba-0e1cafd2858d}" />
+	<object class="MultibandEqEffect" id="{0370ab88-a84a-4bc6-a12c-4832450e79b7}">
+		<property name="filterTypeA">
+			<value>3</value>
+		</property>
+		<property name="frequencyA">
+			<value>22000</value>
+		</property>
+		<property name="qualityA">
+			<value>0.100000001</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{3df241fb-e53e-4f7d-80d7-ec719503adfb}</destination>
+		</relationship>
+	</object>
+	<object class="SidechainModulator" id="{3df241fb-e53e-4f7d-80d7-ec719503adfb}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>frequencyA</value>
+		</property>
+		<property name="amount">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>50</value>
+		</property>
+		<property name="releaseTime">
+			<value>1200</value>
+		</property>
+		<relationship name="sidechains">
+			<destination>{118f1d2d-8152-4e4f-9028-10176e7e7ff5}</destination>
+		</relationship>
+	</object>
+</objects>

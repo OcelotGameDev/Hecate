@@ -3248,7 +3248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CollisionTag: 
-  Event: event:/Cave
+  Event: event:/Garden
   PlayEvent: 1
   StopEvent: 2
   AllowFadeout: 1
@@ -4012,18 +4012,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8501805883822097382, guid: 666497b2370f0354097faf6cb6e489ff, type: 3}
   m_PrefabInstance: {fileID: 292066242}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &970536271
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 970536270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 225c98d418abe1c4d846bd7f6f3d2966, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &970536277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4158,6 +4146,7 @@ GameObject:
   - component: {fileID: 1021151711}
   - component: {fileID: 1021151710}
   - component: {fileID: 1021151712}
+  - component: {fileID: 1021151713}
   m_Layer: 3
   m_Name: PlayerImage
   m_TagString: Untagged
@@ -4249,6 +4238,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1021151713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021151709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 225c98d418abe1c4d846bd7f6f3d2966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundEvent: event:/Movement/Grass Step
 --- !u!1 &1030955012
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
+using FMODUnity;
 
 
 [CreateAssetMenu(menuName = "Player Parameters")]
@@ -100,6 +101,17 @@ public class PlayerParameters : ScriptableObject
     [BoxGroup("Attack/StrongAttack/Ground")] [SerializeField]
     private float _strongAttackRadius;
 
+    [BoxGroup("Sounds")] [SerializeField] [EventRef]
+    private string _hitSoundEvent;
+
+    [BoxGroup("Sounds")] [SerializeField] [EventRef]
+    private string _shotSoundEvent;
+
+    [BoxGroup("Sounds")] [SerializeField] [EventRef]
+    private string _jumpSoundEvent;
+
+    [BoxGroup("Sounds")] [SerializeField] [EventRef]
+    private string _hitGroundSoundEvent;
 
     public Vector3 GrounderPosition => _grounderPosition;
     public float MovementSpeed => _movementSpeed;
@@ -178,4 +190,12 @@ public class PlayerParameters : ScriptableObject
         center.x *= -1;
         return center;
     }
+
+    public string HitSoundEvent => _hitSoundEvent;
+
+    public string ShotSoundEvent => _shotSoundEvent;
+
+    public string JumpSoundEvent => _jumpSoundEvent;
+
+    public string HitGroundSoundEvent => _hitGroundSoundEvent;
 }

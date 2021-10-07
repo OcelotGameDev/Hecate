@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.01.00">
+	<object class="MixerGroup" id="{19fffa71-8d7e-4b75-8b44-b7dbb8cb4152}">
+		<property name="volume">
+			<value>-5.5</value>
+		</property>
+		<property name="name">
+			<value>Jump_Land</value>
+		</property>
+		<relationship name="effectChain">
+			<destination>{e644ad97-6194-4320-aca2-11a1fd3a8579}</destination>
+		</relationship>
+		<relationship name="panner">
+			<destination>{61961556-1f53-4e19-8746-eb7146a881ba}</destination>
+		</relationship>
+		<relationship name="output">
+			<destination>{6ae1bdae-eaa3-44ce-99cb-83b333812445}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusEffectChain" id="{e644ad97-6194-4320-aca2-11a1fd3a8579}">
+		<relationship name="effects">
+			<destination>{713949ca-f861-44d5-9719-0525b423a944}</destination>
+			<destination>{430dcaa3-6708-4e59-9711-5b41f42f6789}</destination>
+		</relationship>
+	</object>
+	<object class="MixerBusPanner" id="{61961556-1f53-4e19-8746-eb7146a881ba}" />
+	<object class="MixerBusFader" id="{713949ca-f861-44d5-9719-0525b423a944}" />
+	<object class="Sidechain" id="{430dcaa3-6708-4e59-9711-5b41f42f6789}" />
+</objects>

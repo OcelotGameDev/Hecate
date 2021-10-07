@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FMODUnity;
 
 public class HecateAnimatorController : MonoBehaviour
 {
     Rigidbody2D rBody => GetComponent<Rigidbody2D>();
     public Animator animatorH;
     public SpriteRenderer spriter;
+    
 
     void PlayAnimations()
     {
@@ -14,6 +16,7 @@ public class HecateAnimatorController : MonoBehaviour
         {
             spriter.flipX = false;
             animatorH.SetFloat("speed", 1);
+            
         }
         else { animatorH.SetFloat("speed", 0); }
 

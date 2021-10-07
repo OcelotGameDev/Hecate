@@ -1,19 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FMOD;
+using FMODUnity;
 
 public class HecateSounds : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [EventRef] public string SoundEvent;
+
+
+    public void PlayStep()
     {
-        
+        FMODUnity.RuntimeManager.PlayOneShot(SoundEvent);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
