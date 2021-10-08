@@ -8,23 +8,26 @@ public enum TypesOfMonster {Lobisomen, Cachorro, Boss};
 
 public class BaseEnemy : MonoBehaviour, IHittable
 {   
-    public Transform player, nose;
     public GameObject doggy;
+    public Transform player, nose;
     public Transform[] spawnPos;
+    public Collider2D col;
+    public Animator animator;
+    public SpriteRenderer spriteR;
+    public string[] clipNames;
     public LayerMask groundLayer, targetMask, obstaclesLayer;
     
     public TypesOfMonster monsterType;
     public float distanceToChase, distanceToAtk, maxHp, maxSpeed, timeToIdle;
     public float sightRadius, sightAngle, groundSight, direction, dashDistance;
-    
-    
+
     bool isDead=> currentHp <= 0;
     bool movingRight = true, canDash=false, isWere, isDog, isBoss;
     float speed,currentHp, distToPoint, distanceToTarget;
-    int dashMx = 3;
-    Action aiAction;
-    RaycastHit2D hitToGround;
+    int dashMx = 3, clipIndex;
 
+    RaycastHit2D hitToGround;
+    Action aiAction;
     LeonAIBrain brainRef;
     Rigidbody2D rBody;
 
@@ -39,7 +42,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
         speed = maxSpeed;
         currentHp = maxHp;
     }
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +53,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
     {
         if (isDead)
         {
+            clipIndex = 3;
             this.gameObject.SetActive(false);
         }
         else { currentHp -= damage; }
@@ -65,6 +69,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
     {
         hitToGround = Physics2D.Raycast(nose.position, Vector2.down, groundSight, groundLayer);
         LifeEvents();
+        PlayAnimations();
     }
     
     void SetMonsterType()
@@ -73,7 +78,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
         {
             case TypesOfMonster.Lobisomen:
                 {
-                    /* Set values related to EASYgrade Enemy*/
+                    //Set values related to EASYgrade Enemy
                     maxSpeed = 2;
                     maxHp = 5;
                     sightRadius = 3;
@@ -85,7 +90,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
 
             case TypesOfMonster.Cachorro:
                 {
-                    /* Set values related to MIDgrade Enemy*/
+                    //Set values related to MIDgrade Enemy
                     maxSpeed = 5;
                     maxHp = 10;
                     sightRadius = 4;
@@ -96,7 +101,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
                 break;
 
             case TypesOfMonster.Boss:{
-                    /* Set values related to BOSS Enemy*/
+                    //Set values related to BOSS Enemy
                     maxSpeed = 10;
                     maxHp = 15;
                     sightRadius = 6;
@@ -106,6 +111,11 @@ public class BaseEnemy : MonoBehaviour, IHittable
                 }
                 break;
         }
+    }
+
+    void PlayAnimations()
+    {
+        animator.Play(clipNames[clipIndex], 0);
     }
 
     void SightAI()
@@ -165,14 +175,15 @@ public class BaseEnemy : MonoBehaviour, IHittable
     {
         Debug.Log("Idle");
         speed = 0;
-        StartCoroutine(Timer(SightAI)); ;
+        clipIndex = 0;
+        StartCoroutine(Timer(SightAI));
     }
 
     void ToPatrol()
     {
         Debug.Log("Patrol");        
         speed = maxSpeed;
-
+        clipIndex = 1;
         StartCoroutine(Timer(ToIdle));
 
         if (hitToGround.collider != false)
@@ -180,16 +191,17 @@ public class BaseEnemy : MonoBehaviour, IHittable
             if (movingRight)
             {
                 direction = 1;
+                spriteR.flipX = true;
                 rBody.velocity = new Vector2(speed, rBody.velocity.y);
-            }
-            else
+            }else
             {
                 direction = -1;
                 rBody.velocity = new Vector2(-speed, rBody.velocity.y);
             }
         }else{
             movingRight = !movingRight;
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            spriteR.flipX = false;
+            //transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
         }
     }
 
@@ -210,7 +222,8 @@ public class BaseEnemy : MonoBehaviour, IHittable
     void ToAttack()
     {
         Debug.Log("Attack");
-        if (isWere)
+        clipIndex = 2;
+        /*if (isWere)
         {
             
         }
@@ -224,7 +237,7 @@ public class BaseEnemy : MonoBehaviour, IHittable
         if (isBoss)
         {
             BossDash();
-        }
+        }*/
     }
 
     IEnumerator DashTimer()
@@ -289,11 +302,19 @@ public class BaseEnemy : MonoBehaviour, IHittable
         }
     }
 
-    void OnTriggerEnter2D(Collider2D col)
+    void OnTriggerEnter2D()
     {
         if (col.gameObject.CompareTag("Player"))
         {
-            
+            clipIndex = 2;
+        }
+    }
+
+    void OnTriggerExit2D()
+    {
+        if (col.gameObject.CompareTag("Player"))
+        {
+            clipIndex = 0;
         }
     }
 
