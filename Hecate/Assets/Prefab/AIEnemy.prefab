@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1527667085516617675}
   - component: {fileID: 2313490300779324531}
   - component: {fileID: 4105319766538988758}
+  - component: {fileID: 7420110202926243886}
   m_Layer: 0
   m_Name: EnemyImage
   m_TagString: Untagged
@@ -102,6 +103,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7420110202926243886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3552160603570715177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 225c98d418abe1c4d846bd7f6f3d2966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SoundEvent: event:/Enemies/Stone Werewolves/Step
 --- !u!1 &6097615112964736056
 GameObject:
   m_ObjectHideFlags: 0
