@@ -20,7 +20,7 @@ namespace SceneTransition
             set => _playerTravelDistance = value;
         }
     #else
-        public float PlayerTravelDistance => _playerDestiny;
+        public float PlayerTravelDistance => _playerTravelDistance;
     #endif
         
 
