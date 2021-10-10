@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private float _speed = 10;
+    [SerializeField] private float _timeUntilDespawn = 10f;
+    private float _timer; 
     
     private Rigidbody2D _body;
 
@@ -12,8 +15,18 @@ public class Bullet : MonoBehaviour
         _body = this.GetComponent<Rigidbody2D>();
     }
 
+    private void OnEnable()
+    {
+        _timer = _timeUntilDespawn;
+    } 
+    
     private void Update()
     {
+        _timer -= Time.deltaTime;
+        if (_timer <= 0)
+        {
+            Destroy(gameObject);
+        }
         _body.velocity = this.transform.right * _speed;
     }
 
